@@ -66,4 +66,45 @@
 #
 class Solution:
     def findLadders(self, beginWord: 'str', endWord: 'str', wordList: 'List[str]') -> 'List[List[str]]':
+        hm = collections.defaultdict(set)
+        def helper(w1, w2):
+            if len(w1) != len(w2):
+                return False
+            cnt = 0
+            for i in range(len(w1)):
+                if w1[i] != w2[i]:
+                    cnt += 1
+                if cnt > 1:
+                    return False
+            return cnt == 1
+
+        for word in wordList:
+            if helper(word, beginWord):
+                hm[word].add(beginWord)
+                hm[beginWord].add(word)
+        for i, w1 in enumerate(wordList):
+            for j in range(i+1, len(wordList)):
+                if helper(w1, wordList[j]):
+                    hm[w1].add(wordList[j])
+                    hm[wordList[j]].add(w1)
         
+        dq = collections.deque()
+        dq.append(beginWord)
+        seen = collections.defaultdict(str)
+        seen[beginWord] = None
+        while len(dq) > 0:
+            cur = dq.popleft()
+            for nw in hm[cur]:
+                if nw not in seen:
+                    seen[nw] = cur
+                    dq.append(nw)
+                if nw == endWord:
+                    break
+        ans = collections.deque()
+        if endWord not in seen:
+            return []
+        while endWord != beginWord:
+            ans.appendleft(endWord)
+            endWord = seen[endWord]
+        ans.appendleft(endWord)
+        return list(ans)

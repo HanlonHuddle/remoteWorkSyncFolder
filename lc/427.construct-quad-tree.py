@@ -62,4 +62,25 @@ class Node:
 """
 class Solution:
     def construct(self, grid: 'List[List[int]]') -> 'Node':
-        
+        def myVal(tl, br):
+            nonlocal grid
+            ans = grid[tl[0]][tl[1]]
+            for i in range(tl[0], br[0]):
+                for j in range(tl[1], br[1]):
+                    if grid[i][j] != ans:
+                        return '*'
+            return ans
+
+        def helper(tl, br):
+            nonlocal grid
+            mval = myVal(tl, br)
+            if mval == '*':
+                tlnode = helper(tl, ((tl[0]+br[0])//2, (tl[1]+br[1])//2))
+                trnode = helper((tl[0],(tl[1]+br[1])//2), ((br[0]+tl[0])//2,br[1]))
+                blnode = helper(((tl[0]+br[0])//2, tl[1]), (br[0], (tl[1]+br[1])//2))
+                brnode = helper(((tl[0]+br[0])//2, (tl[1]+br[1])//2), br)
+                return Node(mval, False, tlnode, trnode, blnode, brnode)
+            else:
+                return Node(mval, True, None, None, None, None)
+
+        return helper((0,0), (len(grid),len(grid[0])))
