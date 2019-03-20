@@ -43,17 +43,45 @@
 # 
 # 
 #
+
+class myDNode:
+    def __init__(self, k, v):
+        self.prev = None
+        self.next = None
+        self.key = k
+        self.val = v
+
 class LRUCache:
 
     def __init__(self, capacity: int):
-        
+        self.pHead = myDNode('#', '#')
+        self.pTail = myDNode('#', '#')
+        self.pHead.next, self.pTail.prev = self.pTail, self.pHead
+        self.hm = {}
+        self.cap = capacity
 
     def get(self, key: int) -> int:
-        
+        hm = self.hm
+
+        if key not in hm:
+            return -1
+        hm[key].prev.next, hm[key].next.prev = hm[key].next, hm[key].prev
+        self.pTail.prev.next, self.pTail.prev, hm[key].next, hm[key].prev = hm[key], hm[key], self.pTail, self.pTail.prev
+        return hm[key].val
 
     def put(self, key: int, value: int) -> None:
-        
-
+        hm = self.hm
+        if self.cap < 1:
+            return
+        if key in self.hm:
+            hm[key].val = value
+            self.get(key)
+            return
+        if len(hm) >= self.cap:
+            hm.pop(self.pHead.next.key)
+            self.pHead.next, self.pHead.next.next.prev = self.pHead.next.next, self.pHead
+        hm[key] = myDNode(key, value)
+        self.pTail.prev.next, self.pTail.prev, hm[key].next, hm[key].prev = hm[key], hm[key], self.pTail, self.pTail.prev
 
 # Your LRUCache object will be instantiated and called as such:
 # obj = LRUCache(capacity)

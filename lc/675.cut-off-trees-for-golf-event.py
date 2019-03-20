@@ -83,4 +83,51 @@
 #
 class Solution:
     def cutOffTree(self, forest: List[List[int]]) -> int:
+        if len(forest) < 1 or len(forest[0]) < 0:
+            return 0
+        cands = []
         
+        #for i, row in enumerate(forest):
+        #    for j, n in enumerate(row):
+        #        if n > 1:
+        #            cands.append((n, (i, j)))
+        #cands.sort()
+
+        cands = sorted((x, (i, j)) for i in range(len(forest)) 
+                                    for j, x in enumerate(forest[i]) if x > 1)
+
+        ans = 0
+
+        dirs = [(0,1),(1,0),(-1,0),(0,-1)]
+        dq = collections.deque()
+
+        def bfs(start, end):
+            if start == end:
+                return 0
+            nonlocal forest, dirs, dq
+            hm = collections.defaultdict(int)
+            dq.append(start)
+            hm[start] = 0
+            while len(dq) > 0:
+                cur = dq.popleft()
+                i, j = cur[0], cur[1]
+                for dir in dirs:
+                    ni, nj = i+dir[0], j+dir[1]
+                    if 0<=ni<len(forest) and 0<=nj<len(forest[0]) and forest[ni][nj] > 0 and (ni, nj) not in hm:
+                        hm[(ni,nj)] = hm[(i,j)] + 1
+                        dq.append((ni, nj))
+            if end not in hm:
+                return -1
+            return hm[end]
+            
+        curpos = (0, 0)
+
+        for tree in cands:
+            tans = bfs(curpos, tree[1])
+            if tans == -1:
+                return -1
+            else:
+                ans += tans
+            curpos = tree[1]
+        
+        return ans
