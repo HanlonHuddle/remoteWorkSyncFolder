@@ -50,18 +50,13 @@ class Solution:
         :type root: TreeNode
         :rtype: int
         """
-        def helper(root):
-            if not root:
-                return [0, 0, 1]
-            ll, rl, m = 0, 0, 0
-            if root.left:
-                curl = helper(root.left)
-                ll = max(curl[0], curl[1])
-                m = max(curl[2], m)
-            if root.right:
-                curr = helper(root.right)
-                rl = max(curr[0], curr[1])
-                m = max(curr[2], m)
-            return [ll + 1, rl + 1, max(ll + rl + 1, m)]
-
-        return helper(root)[2] - 1
+        ans = 0
+        def depth(rt):
+            nonlocal ans
+            if rt == None:
+                return 0
+            l, r = depth(rt.left), depth(rt.right)
+            ans = max(ans, l+r)
+            return max(l, r) + 1
+        depth(root)
+        return ans
